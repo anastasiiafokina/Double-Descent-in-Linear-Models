@@ -1,16 +1,15 @@
 import numpy as np
 
+#The Double Descent Trigger
 def least_squares(X, y):
     """
-    Closed-form least squares solution.
+    Closed-form least squares solution
     If d < n: w = (X^T X)^{-1} X^T y  (normal equations)
     If d >= n: use minimum-norm solution w = X^T (X X^T)^{-1} y
-    This is the Moore-Penrose pseudoinverse solution.
     """
     n, d = X.shape
     if d <= n:
         # Overdetermined or exactly determined: standard normal equations
-        # Add tiny jitter for numerical stability near interpolation threshold
         A = X.T @ X
         b = X.T @ y
         try:
@@ -28,10 +27,11 @@ def least_squares(X, y):
         w = X.T @ alpha
     return w
 
+#The Smooth Stabilizer
 def ridge_regression(X, y, lam=1e-3):
     """
     Ridge: w = (X^T X + lambda * I)^{-1} X^T y
-    Works for all d.
+    Works for all d
     """
     n, d = X.shape
     A = X.T @ X + lam * np.eye(d)
@@ -39,9 +39,10 @@ def ridge_regression(X, y, lam=1e-3):
     w = np.linalg.solve(A, b)
     return w
 
+#The Step-by-Step Learner
 def gradient_descent_ls(X, y, lr=1e-3, n_iter=10000, tol=1e-8):
     """
-    Gradient descent for least squares (extension).
+    Gradient descent for least squares (extension)
     Gradient: 2/n * X^T (X w - y)
     """
     n, d = X.shape
@@ -56,7 +57,8 @@ def gradient_descent_ls(X, y, lr=1e-3, n_iter=10000, tol=1e-8):
         prev_loss = loss
     return w
 
+#The Performance Grade
 def mse(X, y, w):
-    """Mean squared error."""
+    """Mean squared error"""
     residuals = X @ w - y
     return np.mean(residuals ** 2)
