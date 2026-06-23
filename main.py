@@ -6,7 +6,7 @@ from experiments import (
 )
 from plots import plot_double_descent, plot_noise_comparison
 
-# ─── Config ────────────────────────────────────────────────────────────────────
+#CONFIG
 N_TRAIN    = 150
 NOISE_STD  = 0.5
 LAMBDA     = 1e-3
@@ -14,7 +14,7 @@ SEED       = 42
 # Sweep d from 1 to 3*n in steps of 5 (adjust step for speed vs resolution)
 D_VALUES   = list(range(1, 3 * N_TRAIN + 1, 3))
 
-# ─── Main experiment ───────────────────────────────────────────────────────────
+#MAIN PART
 print("=" * 60)
 print("EXPERIMENT 1: Double Descent (LS vs Ridge)")
 print("=" * 60)
@@ -28,7 +28,7 @@ results = run_double_descent_experiment(
 plot_double_descent(results, n_train=N_TRAIN, lam=LAMBDA,
                     save_path='double_descent.pdf')
 
-# ─── Noise extension ───────────────────────────────────────────────────────────
+#NOISE EXTENSION
 print("\n" + "=" * 60)
 print("EXPERIMENT 2: Effect of Noise")
 print("=" * 60)
@@ -41,7 +41,7 @@ noise_results = run_noise_experiment(
 plot_noise_comparison(noise_results, n_train=N_TRAIN,
                       save_path='noise_comparison.pdf')
 
-# ─── GD vs closed-form extension ──────────────────────────────────────────────
+#GD VS CLOSED-FORM EXTENSION
 print("\n" + "=" * 60)
 print("EXPERIMENT 3: Gradient Descent vs Closed-Form (d < n)")
 print("=" * 60)
