@@ -2,6 +2,7 @@ import numpy as np
 from data import generate_synthetic_data, train_test_split
 from models import least_squares, ridge_regression, gradient_descent_ls, mse
 
+#The Peak Finder
 def run_double_descent_experiment(
     n_train=150,
     d_values=None,
@@ -10,7 +11,7 @@ def run_double_descent_experiment(
     seed=42
 ):
     """
-    Fix n_train. Vary dimension d from 1 to 3*n_train.
+    Fix n_train. Vary dimension d from 1 to 3*n_train
     For each d:
       - Generate data in R^d
       - Fit least squares (closed-form / pseudoinverse)
@@ -57,6 +58,7 @@ def run_double_descent_experiment(
     return results
 
 
+#The Multi-Universe Tester
 def run_noise_experiment(n_train=150, d_values=None, noise_levels=None, seed=42):
     """Extension: vary noise std and observe effect on double descent."""
     if noise_levels is None:
@@ -75,6 +77,7 @@ def run_noise_experiment(n_train=150, d_values=None, noise_levels=None, seed=42)
     return all_results
 
 
+#The Mathematical Audit
 def run_gd_vs_closedform(n_train=100, d=50, noise_std=0.5, seed=42):
     """Extension: compare gradient descent vs closed-form least squares."""
     n_total = n_train + 200
