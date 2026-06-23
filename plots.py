@@ -21,9 +21,9 @@ def plot_double_descent(results, n_train, lam, save_path='double_descent.pdf'):
         ['Model dimension $d$', 'Complexity ratio $d/n$']
     ):
         ax.plot(x, ls_train, '--', color='steelblue',  label='LS train',   linewidth=1.5)
-        ax.plot(x, ls_test,  '-',  color='steelblue',  label='LS test',    linewidth=2)
+        ax.plot(x, ls_test,  '-',  color='steelblue',  label='LS test',    linewidth=2.5)
         ax.plot(x, r_train,  '--', color='tomato',     label='Ridge train', linewidth=1.5)
-        ax.plot(x, r_test,   '-',  color='tomato',     label='Ridge test',  linewidth=2)
+        ax.plot(x, r_test,   '-',  color='tomato',     label='Ridge test',  linewidth=1.5)
 
         # Mark interpolation threshold
         thresh_x = n_train / n_train if xlabel.startswith('Complex') else n_train
