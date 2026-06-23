@@ -3,41 +3,30 @@ import numpy as np
 #The Double Descent Trigger
 def least_squares(X, y):
     """
-    Closed-form least squares solution
-    If d < n: w = (X^T X)^{-1} X^T y  (normal equations)
-    If d >= n: use minimum-norm solution w = X^T (X X^T)^{-1} y
+    Closed-form least squares solution using pseudo-inverse.
+    Ensures the interpolation peak naturally forms at d = n.
     """
     n, d = X.shape
-    if d <= n:
-        # Overdetermined or exactly determined: standard normal equations
-        A = X.T @ X
-        b = X.T @ y
-        try:
-            w = np.linalg.solve(A, b)
-        except np.linalg.LinAlgError:
-            w = np.linalg.lstsq(X, y, rcond=None)[0]
+    if d < n:
+        return np.linalg.pinv(X.T @ X) @ X.T @ y
     else:
-        # Underdetermined: minimum-norm solution via dual formulation
-        # w = X^T (X X^T)^{-1} y
-        A = X @ X.T
-        try:
-            alpha = np.linalg.solve(A, y)
-        except np.linalg.LinAlgError:
-            alpha = np.linalg.lstsq(X @ X.T, y, rcond=None)[0]
-        w = X.T @ alpha
-    return w
+        return X.T @ np.linalg.pinv(X @ X.T) @ y
 
 #The Smooth Stabilizer
 def ridge_regression(X, y, lam=1e-3):
     """
-    Ridge: w = (X^T X + lambda * I)^{-1} X^T y
-    Works for all d
+    Ridge regression using primal/dual forms.
+    Switches to dual form when d > n to prevent numerical explosion.
     """
     n, d = X.shape
-    A = X.T @ X + lam * np.eye(d)
-    b = X.T @ y
-    w = np.linalg.solve(A, b)
-    return w
+    if d <= n:
+        # Primal form: stable when features <= samples
+        A = X.T @ X + lam * np.eye(d)
+        return np.linalg.solve(A, X.T @ y)
+    else:
+        # Dual form: stable when features > samples
+        A = X @ X.T + lam * np.eye(n)
+        return X.T @ np.linalg.solve(A, y)
 
 #The Step-by-Step Learner
 def gradient_descent_ls(X, y, lr=1e-3, n_iter=10000, tol=1e-8):

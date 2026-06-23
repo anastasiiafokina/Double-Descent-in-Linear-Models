@@ -44,7 +44,7 @@ def plot_double_descent(results, n_train, lam, save_path='double_descent.pdf'):
 
 def plot_noise_comparison(all_results, n_train, save_path='noise_comparison.pdf'):
     noise_levels = list(all_results.keys())
-    colors = plt.cm.viridis(np.linspace(0.1, 0.9, len(noise_levels)))
+    colors = plt.colormaps['viridis'](np.linspace(0.1, 0.9, len(noise_levels)))
 
     fig, ax = plt.subplots(figsize=(9, 5))
     for sigma, color in zip(noise_levels, colors):
