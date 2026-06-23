@@ -1,0 +1,139 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\usepackage{microtype}
+
+\title{\textbf{Double Descent in Linear Models}\\
+       \large Statistical Methods for Machine Learning}
+\author{Your Name \\ Student ID}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\noindent\textit{I declare that this material, which I now submit for assessment, is entirely 
+my own work and has not been taken from the work of others, save and to the extent that such 
+work has been cited and acknowledged within the text of my work. I understand that plagiarism, 
+collusion, and copying are grave and serious offences in the university and accept the penalties 
+that would be imposed should I engage in plagiarism, collusion or copying. This assignment, or 
+any part of it, has not been previously submitted by me or any other person for assessment on 
+this or any other course of study.}
+
+\section{Introduction}
+Classical learning theory predicts that increasing model complexity first decreases 
+bias but increases variance, producing a U-shaped test error curve. Recent work by 
+Belkin et al.\ (2019) shows this picture is incomplete: beyond the \emph{interpolation 
+threshold} $d = n$, where the model can perfectly fit training data, test error 
+can \emph{decrease again} --- the double descent phenomenon.
+
+\section{Dataset}
+\subsection{Synthetic Data}
+We generate $n_{\text{total}}$ samples from the linear model
+\[
+    y = \mathbf{x}^\top \mathbf{w}^* + \varepsilon,
+    \quad \mathbf{x} \sim \mathcal{N}(\mathbf{0}, I_d),
+    \quad \varepsilon \sim \mathcal{N}(0, \sigma^2),
+\]
+where $\mathbf{w}^* \in \mathbb{R}^d$ has entries drawn i.i.d.\ from 
+$\mathcal{N}(0, 1/d)$. We fix $n_{\text{train}} = 150$ and a test set of 200 
+samples, and vary $d \in \{1, 4, \ldots, 450\}$ to trace the full double descent curve.
+
+\textbf{Choice justification:} Gaussian inputs give rotational symmetry and 
+make eigenvalue analysis tractable. Scaling $\mathbf{w}^*$ by $1/\sqrt{d}$ 
+keeps the signal-to-noise ratio constant across dimensions, isolating the 
+effect of overparameterization.
+
+\section{Methods}
+\subsection{Least Squares}
+We use the minimum-norm least-squares solution throughout, which equals
+\[
+    \hat{\mathbf{w}}_{\text{LS}} = \mathbf{X}^\dagger \mathbf{y},
+\]
+computed via the normal equations for $d \le n$ and the dual formulation 
+$\hat{\mathbf{w}} = \mathbf{X}^\top(\mathbf{X}\mathbf{X}^\top)^{-1}\mathbf{y}$
+for $d > n$. This is the solution selected by gradient descent from the 
+origin, making it the natural object to study.
+
+\subsection{Ridge Regression}
+\[
+    \hat{\mathbf{w}}_\lambda = (\mathbf{X}^\top \mathbf{X} + \lambda I)^{-1}
+    \mathbf{X}^\top \mathbf{y}, \quad \lambda = 10^{-3}.
+\]
+Ridge is well-conditioned for all $d$ and eliminates the peak at the 
+interpolation threshold.
+
+\section{Results}
+\subsection{Double Descent}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=\linewidth]{../double_descent.pdf}
+    \caption{Test and train MSE vs model dimension $d$ (left) and 
+    complexity ratio $d/n$ (right). The vertical dotted line marks 
+    the interpolation threshold $d = n = 150$.}
+    \label{fig:dd}
+\end{figure}
+
+Figure~\ref{fig:dd} clearly shows three regimes for least squares:
+\begin{enumerate}
+    \item \textbf{Underparameterized} ($d < n$): classical bias-variance 
+    trade-off; test error decreases as $d$ grows.
+    \item \textbf{Near interpolation threshold} ($d \approx n$): test error 
+    spikes because $\mathbf{X}^\top\mathbf{X}$ is nearly singular, causing 
+    extreme variance amplification.
+    \item \textbf{Overparameterized} ($d > n$): test error decreases again; 
+    the minimum-norm interpolating solution generalizes well when $d \gg n$.
+\end{enumerate}
+
+Ridge regression avoids the spike by regularizing away near-zero eigenvalues, 
+maintaining stable performance across all $d$.
+
+\subsection{Effect of Noise (Extension)}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.7\linewidth]{../noise_comparison.pdf}
+    \caption{Test MSE of least squares for varying noise levels $\sigma$.}
+    \label{fig:noise}
+\end{figure}
+
+Higher noise amplifies the peak at the interpolation threshold and raises 
+the asymptotic floor in the overparameterized regime. With very low noise, 
+the peak nearly vanishes and the overparameterized solution approaches zero 
+test error.
+
+\subsection{Gradient Descent vs Closed-Form (Extension)}
+For $d < n$, gradient descent initialized at $\mathbf{0}$ converges to 
+the same solution as the closed-form formula (the minimum-norm solution 
+in the $d \ge n$ case). Numerically, both yield nearly identical train 
+and test MSE once GD is run until convergence, confirming theoretical 
+equivalence.
+
+\section{Discussion}
+The results confirm the double descent phenomenon described by Belkin et al. 
+The classical bias-variance trade-off is a special case valid only in the 
+underparameterized regime. Ridge regression provides a practically robust 
+alternative that avoids the interpolation peak while retaining good 
+generalization everywhere.
+
+\textbf{Limitations:} Our synthetic setup uses Gaussian data with a truly 
+linear target; real datasets may not exhibit clean double descent due to 
+model misspecification or structured noise.
+
+\section{Conclusion}
+We reproduced the double descent curve in linear regression from scratch 
+using only NumPy. The key insight is that overparameterized models 
+generalize well when using minimum-norm solutions, and that explicit 
+regularization (ridge) offers a smooth alternative.
+
+\bibliographystyle{plainnat}
+\begin{thebibliography}{1}
+\bibitem{belkin2019}
+M.\ Belkin, D.\ Hsu, S.\ Ma, S.\ Mandal.
+\textit{Reconciling modern machine learning practice and the 
+classical bias-variance trade-off.}
+PNAS, 2019.
+\end{thebibliography}
+
+\end{document}
