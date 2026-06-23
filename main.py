@@ -49,15 +49,3 @@ print("=" * 60)
 run_gd_vs_closedform(n_train=100, d=50, noise_std=NOISE_STD, seed=SEED)
 
 print("\nDone. Plots saved.")
-
-# ─── DIAGNOSTIC OVERRIDE PRINT ───────────────────────────────────────────
-print("\n" + "!" * 50)
-print("CRITICAL DIAGNOSTIC CHECK (d=148, near threshold)")
-print("!" * 50)
-idx_148 = results['d'].index(148) if 148 in results['d'] else 0
-if idx_148:
-    print(f"LS TEST MSE AT d=148:    {results['ls_test'][idx_148]:.4f}")
-    print(f"RIDGE TEST MSE AT d=148: {results['ridge_test'][idx_148]:.4f}")
-else:
-    print(f"LS TEST MSE AT FIRST STEP: {results['ls_test'][0]:.4f}")
-print("!" * 50 + "\n")
